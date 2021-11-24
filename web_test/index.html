@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/three@0.131.3/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.131.3/examples/js/controls/OrbitControls.js"></script>
+    <script src="ObjectLoader.js"></script>
+    <script>
+        const canW = 680; //canvas横:任意値 
+        const canH = 400; //canvas縦:任意値 
+        const modelPath = "model.json";//書き出したjsonファイル 　
+        const scene, camera, renderer;　
+        function init() {　　
+          const container = document.getElementById('canvas-area');　　
+          scene = new THREE.Scene();
+       
+          // CAMERA:透視投影 　　
+          camera = new THREE.PerspectiveCamera(45, canW / canH, 1, 1000);　　
+          scene.add(camera);　　
+          camera.position.set(40, 20, 20);
+       
+          //レンダラー　　
+          renderer = new THREE.WebGLRenderer({
+            antialias: true
+          });　　
+          renderer.setSize(canW, canH);　
+          container.appendChild(renderer.domElement);
+       
+          //ライト 　　
+          const directionalLight = new THREE.DirectionalLight(0xFFFFCD, 0.8);　　
+          directionalLight.position.set(0, 60, 200);　　
+          const ambientLight = new THREE.AmbientLight(0xFFFFCD);　　
+          scene.add(directionalLight, ambientLight);
+       
+          //オブジェクト　
+          const loader = new THREE.JSONLoader();　　
+          loader.load(modelPath, function(geo, mat) {　　　
+            const faceMat = new THREE.MeshFaceMaterial(mat);　　　
+            const model = new THREE.Mesh(geo, faceMat);　　　
+            model.position.set(0, -5, 0);　　　
+            model.scale.set(10, 10, 10);　　　
+            scene.add(model);　　　
+            rendering();　　
+          });　　
+       
+          //コントローラー 
+          controls = new THREE.OrbitControls(camera, renderer.domElement);　
+          controls.maxDistance = 1000;　　
+          controls.maxPolarAngle = Math.PI * 0.48;
+       
+          //軸表示 　　
+          const axis = new THREE.AxisHelper(1000);
+          scene.add(axis);　
+        }
+       
+        function rendering() {　
+          requestAnimationFrame(rendering, renderer.domElement);　
+          renderer.render(scene, camera);
+        }
+        $(function() {　
+          init();
+        });
+        </script>
+  </head>
+  <body>
+    
+        <div id="canvas-area" style="display: block;">
+          
+          <canvas width="960" height="540" style="width: 960px; height: 540px;"></canvas>
+        </div>
+   
+  </body>
+</html>
